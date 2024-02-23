@@ -20,7 +20,6 @@ from django.http import JsonResponse
 from django.core.serializers import serialize
 import json
 from django.core.exceptions import ValidationError
-from base.custom_permission import LocationPermission
 
 
 class SignInViewset(viewsets.ViewSet):
