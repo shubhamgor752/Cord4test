@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from chat.serializers import (
     SendMessageSerializer
 )
-from Register.models import UserProfile
+from register.models import UserProfile
 # from administration.utils import user_information
 
 from chat.models import ChatMessage
