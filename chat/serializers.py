@@ -9,7 +9,6 @@ class SendMessageSerializer(serializers.Serializer):
 
     def validate(self, fields):
         receiver = fields.get("receiver")
-        receivers = fields.get("receivers")
         message = fields.get("message")
 
         if not any([receiver]):

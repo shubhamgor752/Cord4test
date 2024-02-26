@@ -6,15 +6,15 @@ from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from django.contrib.auth.models import User
-from register.models import UserProfile
-from register.serializers import (
+from Register.models import UserProfile
+from Register.serializers import (
     CustomUserSerializer,
     UserProfileInfo,
     USERNAME_VALIDATORS,
     LocationSerializer
 )
 from django.shortcuts import get_object_or_404
-from register.models import CustomUser
+from Register.models import CustomUser
 from rest_framework.authentication import TokenAuthentication
 from django.http import JsonResponse
 from django.core.serializers import serialize
