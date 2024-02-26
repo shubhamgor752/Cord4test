@@ -41,7 +41,6 @@ class UserProfileInfo(serializers.ModelSerializer):
             # "date_of_birth",
             "first_name",
             "email",
-            # "gender",
             "phone_number",
             "profession",
             "username",

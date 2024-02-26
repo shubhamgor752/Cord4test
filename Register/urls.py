@@ -1,4 +1,4 @@
-from .views import SignInViewset, UserViewset
+from .views import SignInViewset, UserViewset, SwitchAccount
 from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
@@ -8,7 +8,7 @@ router.register("user", UserViewset, basename="user")  # edit user/business prof
 
 # router.register("username/verification", UsernameVerification, basename="username_verification")
 
-# router.register("switch-account", SwitchAccount, basename="switch_account")
+router.register("switch-account", SwitchAccount, basename="switch_account")
 
 
 

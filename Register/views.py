@@ -37,12 +37,13 @@ class SignInViewset(viewsets.ViewSet):
                 else None
             )
             if otp and otp == 1234:
-                user_instance = UserProfile.objects.filter(
-                    phone_number=mobile_number
-                ).first()
+                user_instance = UserProfile.objects.filter(phone_number=mobile_number).first()
 
                 if user_instance:
                     user_token = Token.objects.filter(user=user_instance).first()
+                    if not user_token:
+                        user_token = Token.objects.create(user=user_instance)
+
                     response = {
                         # "mobile_number": mobile_number,
                         "user_token": user_token.key,
@@ -56,7 +57,7 @@ class SignInViewset(viewsets.ViewSet):
                         phone_number=mobile_number,
                     )
                     if user_instance != {}:
-                        user_token = Token.objects.filter(user=user_instance).last()
+                        user_token = Token.objects.filter(user=user_instance).first()
                         if not user_token:
                             user_token = Token.objects.create(user=user_instance)
                         # else:
@@ -107,7 +108,15 @@ class UserViewset(viewsets.ViewSet):
                 .exclude(id=instance.id)
                 .exists()
             ):
-                message = "Username already taken"
+                message = "Username duplicate"
+            elif (
+                phone_number
+                and UserProfile.objects.filter(phone_number=phone_number)
+                .exclude(id=instance.id)
+                .exclude(is_superuser=True)
+                .exists()
+            ):
+                message = "phone number is already in use"
             elif (
                 email
                 and UserProfile.objects.filter(email=email)
@@ -115,25 +124,21 @@ class UserViewset(viewsets.ViewSet):
                 .exclude(is_superuser=True)
                 .exists()
             ):
-                message = "Duplicate email address"
+                message = "email is already in use"
+        
             else:
                 response = serializer.save(request=request)
+
+                serialized_data = self.serializer_class(response).data
+
                 message = "User update successful"
-                # Convert CustomUser object to dictionary
-                serialized_data = serialize(
-                    "json",
-                    [
-                        response,
-                    ],
-                )
-                response_data = json.loads(serialized_data)[0]["fields"]
+
                 return JsonResponse(
-                    {"status": True, "message": message, "data": response_data},
+                    {"status": True, "message": message, "data": serialized_data},
                     status=status.HTTP_200_OK,
                 )
         except Exception as e:
             message = str(e)
-        # Debugging statement
         return JsonResponse(
             {"status": False, "message": message, "data": {}},
             status=status.HTTP_400_BAD_REQUEST,
@@ -158,3 +163,34 @@ class UserViewset(viewsets.ViewSet):
         )
 
 
+class SwitchAccount(viewsets.ViewSet):
+    permission_classes = (IsAuthenticated,)
+    message = "INVALID_REQUEST"
+
+    def create(self, request):
+        try:
+            user_instance = get_object_or_404(
+                CustomUser, username=request.user.username
+            )
+            if user_instance.is_private:
+                message = "Switched to public"
+                user_instance.is_private = False
+            else:
+                message = "Switched to private"
+                user_instance.is_private = True
+            user_instance.save()
+            return Response(
+                {
+                    "status": True,
+                    "message": message,
+                },
+                status=status.HTTP_201_CREATED,
+            )
+
+        except Exception as e:
+            self.message = str(e)
+
+        return Response(
+            {"status": False, "message": self.message},
+            status=status.HTTP_400_BAD_REQUEST,
+        )

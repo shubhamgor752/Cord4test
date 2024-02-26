@@ -3,11 +3,10 @@ from Register.models import UserProfile, CustomUser
 
 
 class CustomUserAdmin(admin.ModelAdmin):
-    list_display = ("id", "username", "first_name","is_private","is_superuser")
+    list_display = ("id", "username", "first_name","is_superuser")
     fields = [
         "username",
         "first_name",
-        "is_private"
         "is_superuser",
     ]
 
@@ -24,6 +23,7 @@ class UserProfileAdmin(admin.ModelAdmin):
         "phone_number",
         "email",
         "date_of_birth",
+        "is_private",
         "is_superuser",
     ]
     list_display = (
