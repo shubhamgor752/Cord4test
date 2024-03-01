@@ -148,7 +148,7 @@ class UserViewset(viewsets.ViewSet):
         try:
             user_obj = get_object_or_404(UserProfile, username=pk)
             response = UserProfileInfo(user_obj, context={"request": request}).data
-            message = "USER_INFORMATION"
+            message = "User Information"
             return Response(
                 {"status": True, "message": message, "data": response},
                 status=status.HTTP_200_OK,

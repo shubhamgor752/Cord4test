@@ -12,6 +12,7 @@ class Userchat(admin.ModelAdmin):
         "id",
         "sender",
         "receiver",
+        "media",
         "forwarded_by",
     ]
     list_display = (
@@ -19,6 +20,7 @@ class Userchat(admin.ModelAdmin):
         "sender",
         "receiver",
         "message",
+        "media",
         "forwarded_by"
     )
 

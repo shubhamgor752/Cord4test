@@ -3,7 +3,7 @@ from django.contrib.auth.models import AbstractUser
 import uuid
 
 # Create your models here.
-
+PROFILE_IMAGE = "profile.jpeg"
 
 class CustomUser(AbstractUser):
     # id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -11,8 +11,9 @@ class CustomUser(AbstractUser):
     bio = models.CharField(max_length=1024, null=True, blank=True)
     email = models.EmailField(null=True, blank=True)
     is_private = models.BooleanField(default=False)
+    # profile_image = models.URLField(max_length=1024, default=PROFILE_IMAGE)
 
-    # phone_number = models.CharField(max_length=20, blank=True, null=True)
+
 
     class Meta:
         verbose_name = "custom user"

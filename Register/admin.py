@@ -31,7 +31,6 @@ class UserProfileAdmin(admin.ModelAdmin):
         "username",
         "first_name",
         "phone_number",
-        "bio",
         "email",
         "date_of_birth",
     )

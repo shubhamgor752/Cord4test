@@ -1,18 +1,24 @@
 from rest_framework import serializers
+from chat.models import ChatMessage
 
 class SendMessageSerializer(serializers.Serializer):
-    receiver = serializers.CharField(required=False, help_text="ID of user,club or event")
+    receiver = serializers.CharField(required=False, help_text="ID of user")
     message = serializers.CharField(required=False, help_text="Message")
-    reply_id = serializers.CharField(required=False, help_text="ID of message on which user reply")
     forward_id = serializers.CharField(required=False, help_text="Forword message ")
+    media = serializers.ImageField(required=False, help_text="Media attachment")
+
+
+#   for message edit
+    message_id = serializers.CharField(required=False, help_text="ID of message")
 
 
     def validate(self, fields):
         receiver = fields.get("receiver")
         message = fields.get("message")
+        media = fields.get("media")
 
         if not any([receiver]):
             raise serializers.ValidationError("receiver(s) ID should be present")
-        if not any([message]):
+        if not any([message, media]):
             raise serializers.ValidationError("Message, attachment or post should be present")
         return fields
