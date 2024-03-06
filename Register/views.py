@@ -41,16 +41,17 @@ class SignInViewset(viewsets.ViewSet):
 
                 if user_instance:
                     user_token = Token.objects.filter(user=user_instance).first()
+                    
                     if not user_token:
                         user_token = Token.objects.create(user=user_instance)
 
+                    
+                    message = "Sign-in complete. You're now connected and ready to go."
                     response = {
                         # "mobile_number": mobile_number,
                         "user_token": user_token.key,
                         "user": UserProfileInfo(user_instance).data,
                     }
-                    message = "Sign-in complete. You're now connected and ready to go."
-
                 else:
                     # user_data = {"mobile_number": mobile_number}
                     user_instance = UserProfile.objects.create(
@@ -65,20 +66,24 @@ class SignInViewset(viewsets.ViewSet):
                         #     user_token = Token.objects.create(user=user_obj)
                         response = {
                             "user_token": user_token.key,
-                            "mobile_number": user_instance.username,
+                            "mobile_number": mobile_number,
                         }
                         message = "Great news! User creation is a success. Get ready to embark on your journey."
-                self.res_status, self.data, self.message = (
-                    True,
-                    response,
-                    message,
+                
+                self.res_status = True
+                self.data = response
+                self.message = message
+
+                return Response(
+                    {"status": self.res_status, "message": self.message, "data": self.data},
+                    status=status.HTTP_201_CREATED,
                 )
+
         return Response(
             {
                 "status": self.res_status,
                 "code": HttpResponse.status_code,
                 "message": self.message,
-                "data": self.data,
             }
         )
 
