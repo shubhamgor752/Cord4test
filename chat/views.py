@@ -71,9 +71,8 @@ class SendMessageViewSet(viewsets.ViewSet):
 
                         if request.user.userprofile == message_to_edit.sender:
                             time_elapsed = timezone.now() - message_to_edit.timestamp
-                            if time_elapsed.total_seconds() <= 120:
+                            if time_elapsed.total_seconds() <= 120:  # msg edit only for 2 min
                                 message_to_edit.message = message
-                                message_to_edit.media = media
                                 message_to_edit.save()
                                 return Response(
                                     {"status": True, "message": "Message edited successfully", "data": serializer.data},
@@ -111,7 +110,7 @@ class SendMessageViewSet(viewsets.ViewSet):
                 {"status": False, "message": str(e), "data": {}},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
-        
+          
     def list(self, request, *args, **kwargs):
         try:
             conversation_messages = ChatMessage.objects.filter(sender=request.user.userprofile)

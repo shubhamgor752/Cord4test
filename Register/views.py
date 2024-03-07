@@ -73,7 +73,6 @@ class SignInViewset(viewsets.ViewSet):
                 self.res_status = True
                 self.data = response
                 self.message = message
-
                 return Response(
                     {"status": self.res_status, "message": self.message, "data": self.data},
                     status=status.HTTP_201_CREATED,
@@ -84,6 +83,7 @@ class SignInViewset(viewsets.ViewSet):
                 "status": self.res_status,
                 "code": HttpResponse.status_code,
                 "message": self.message,
+                # "data": self.data,
             }
         )
 
@@ -93,7 +93,7 @@ class UserViewset(viewsets.ViewSet):
     permission_classes = (IsAuthenticated,)
     authentication_classes = (
         TokenAuthentication,
-    )  # Ensure token authentication is enabled
+    )  
 
     def create(self, request):
         try:
