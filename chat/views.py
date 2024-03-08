@@ -89,7 +89,6 @@ class SendMessageViewSet(viewsets.ViewSet):
         except Exception as e:
             return Response({"status": False, "message": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-
     def destroy(self, request, pk=None):
         try:
             message = ChatMessage.objects.get(pk=pk)
@@ -127,13 +126,12 @@ class EditMessageViewSet(viewsets.ViewSet):
                 try:
                     # Retrieve the message to be edited
                     message_to_edit = ChatMessage.objects.get(id=message_id)
-                    print("message_to_edit:", message_to_edit)
                 except ChatMessage.DoesNotExist:
                     raise serializers.ValidationError("Message to edit does not exist")
 
                 if request.user.userprofile == message_to_edit.sender:
                     time_elapsed = timezone.now() - message_to_edit.timestamp
-                    if time_elapsed.total_seconds() <= 1200:  # msg edit only for 2 min
+                    if time_elapsed.total_seconds() <= 120:  # msg edit only for 2 min
                         message_to_edit.message = message
 
                         print("new_message::", message)
@@ -144,7 +142,7 @@ class EditMessageViewSet(viewsets.ViewSet):
                         )
                     else:
                         return Response(
-                            {"status": False, "message": "Message can't be edited after 2 minutes", "data": {}},
+                            {"status": False, "message": "Message can't be edited after 2 minutes"},
                             status=status.HTTP_400_BAD_REQUEST,
                         )
                 else:
