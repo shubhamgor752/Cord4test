@@ -22,3 +22,12 @@ class SendMessageSerializer(serializers.Serializer):
         if not any([message, media]):
             raise serializers.ValidationError("Message, attachment or post should be present")
         return fields
+    
+
+
+class EditMessageSerializer(serializers.Serializer):
+    #   for message edit
+    message_id = serializers.CharField(required=False, help_text="ID of message")
+    message = serializers.CharField(required=False, help_text="New Message")
+
+

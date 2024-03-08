@@ -32,6 +32,7 @@ class UserProfileAdmin(admin.ModelAdmin):
         "first_name",
         "phone_number",
         "email",
+        "is_private",
         "date_of_birth",
     )
     search_fields = ("username", "first_name", "phone_number")
