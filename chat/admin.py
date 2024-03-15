@@ -20,7 +20,7 @@ class Userchat(admin.ModelAdmin):
         "sender",
         "receiver",
         "message",
-        "media",
+        "suggested_message",
         "forwarded_by"
     )
 

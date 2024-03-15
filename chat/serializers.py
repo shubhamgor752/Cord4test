@@ -31,3 +31,8 @@ class EditMessageSerializer(serializers.Serializer):
     message = serializers.CharField(required=False, help_text="New Message")
 
 
+
+
+class SuggestionMessageSerializer(serializers.Serializer):
+    message_id = serializers.CharField(required=False, help_text="ID of message")
+    receiver = serializers.CharField(required=False, help_text="Forword message ")

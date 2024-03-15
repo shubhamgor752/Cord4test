@@ -87,7 +87,6 @@ class CustomUserSerializer(serializers.Serializer):
         # Get the instance if it's not None
         if instance:
             instance = UserProfile.objects.filter(id=instance.id).first()
-            print("==================", instance)
             context["phone_number"] = validated_data.get(
                 "phone_number", instance.phone_number
             )

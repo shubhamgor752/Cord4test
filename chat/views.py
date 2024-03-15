@@ -6,15 +6,15 @@ from rest_framework import viewsets, status, serializers
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from chat.serializers import (
-    SendMessageSerializer , EditMessageSerializer
+    SendMessageSerializer , EditMessageSerializer , SuggestionMessageSerializer
 )
 from Register.models import UserProfile
 # from administration.utils import user_information
 from chat.models import ChatMessage
 import uuid
 from django.utils import timezone
-
-
+import random
+from base.message import suggested_messages
 
 
 class SendMessageViewSet(viewsets.ViewSet):
@@ -101,9 +101,7 @@ class SendMessageViewSet(viewsets.ViewSet):
             return Response({"status": False, "message": "Message not found"}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({"status": False, "message": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
-
-
+       
 
 class EditMessageViewSet(viewsets.ViewSet):
     permission_classes = (IsAuthenticated,)
@@ -161,3 +159,40 @@ class EditMessageViewSet(viewsets.ViewSet):
                 {"status": False, "message": str(e), "data": {}},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
+        
+
+class SuggestMessageViewSet(viewsets.ViewSet):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = SuggestionMessageSerializer
+
+    def create(self, request, *args, **kwargs):
+        try:
+            serializer = self.serializer_class(data=request.data)
+            if serializer.is_valid():
+                request_data = serializer.validated_data
+                receiver = request.user.userprofile
+                print("receiver: ", receiver)
+                message_id = request_data.get("message_id")
+
+                try:
+                    sender_message = ChatMessage.objects.get(id=message_id)
+                except ChatMessage.DoesNotExist:
+                    return Response({"error": "Message with the given ID does not exist"}, status=status.HTTP_404_NOT_FOUND)
+                
+                if sender_message.receiver == receiver:
+                    if sender_message.id == int(message_id):
+                        sender_message.suggested_message = suggested_messages
+                        sender_message.save()
+
+                        return Response(
+                            {"status": True, "message": "Suggested message sent successfully", "data": serializer.data},
+                            status=status.HTTP_201_CREATED,
+                        )
+                    else:
+                        return Response({"error": "Permission denied"},status=status.HTTP_403_FORBIDDEN)
+                else:
+                    return Response({"error": "Permission denied. You can only suggest messages where you are the receiver."},status=status.HTTP_403_FORBIDDEN)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
