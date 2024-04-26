@@ -9,10 +9,10 @@ from .models import ChatMessage
 
 class Userchat(admin.ModelAdmin):
     fields = [
-        "id",
         "sender",
         "receiver",
-        "media",
+        # "media",
+        "message",
         "forwarded_by",
     ]
     list_display = (

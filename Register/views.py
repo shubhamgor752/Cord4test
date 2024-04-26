@@ -87,7 +87,6 @@ class SignInViewset(viewsets.ViewSet):
             }
         )
 
-
 class UserViewset(viewsets.ViewSet):
     serializer_class = CustomUserSerializer
     permission_classes = (IsAuthenticated,)
@@ -166,7 +165,6 @@ class UserViewset(viewsets.ViewSet):
             {"status": False, "message": message, "data": {}},
             status=status.HTTP_400_BAD_REQUEST,
         )
-
 
 class SwitchAccount(viewsets.ViewSet):
     permission_classes = (IsAuthenticated,)

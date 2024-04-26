@@ -10,7 +10,7 @@ from rest_framework.response import Response
 
 # import re
 USERNAME_VALIDATORS = [
-    MinLengthValidator(4, "Username must be at least 4 characters long"),
+    MinLengthValidator(4, "Username must be at least 4 characters long"),   
     MaxLengthValidator(50, "Username cannot be longer than 50 characters"),
     RegexValidator(
         r"^\w+$",
@@ -23,13 +23,12 @@ class UserSignUpSerializer(serializers.Serializer):
     mobile_number = serializers.CharField(required=True)
     otp = serializers.IntegerField(required=False)
 
-    # def validate_mobile_number(self, value):
-    #     pattern = r'^\d{10}$'
-    #     if not re.match(pattern, value):
-    #         raise serializers.ValidationError("Invalid mobile number")
-
-    #     return value
-
+    @staticmethod
+    def validate_phone_number(mobile_number):
+        if len(str(mobile_number)) != 10:
+            raise serializers.ValidationError("Length of phone number should be 10 digits")
+        
+        return mobile_number
 
 class UserProfileInfo(serializers.ModelSerializer):
 
