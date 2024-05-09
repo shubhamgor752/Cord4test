@@ -3,7 +3,7 @@ from Register.models import UserProfile, CustomUser
 
 
 class CustomUserAdmin(admin.ModelAdmin):
-    list_display = ("id", "username", "first_name","is_superuser")
+    list_display = ("id", "username", "first_name", "is_superuser")
     fields = [
         "username",
         "first_name",
@@ -34,6 +34,7 @@ class UserProfileAdmin(admin.ModelAdmin):
         "email",
         "is_private",
         "date_of_birth",
+        "is_superuser",
     )
     search_fields = ("username", "first_name", "phone_number")
 

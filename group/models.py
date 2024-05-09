@@ -12,18 +12,27 @@ class CustomGroup(models.Model):
     join_requests = models.ManyToManyField(
         CustomUser, related_name="join_requests", blank=True
     )
-    
+
     def __str__(self):
-        return self.group_name 
-    
+        return self.group_name
 
 
 
 class GroupChat(models.Model):
     group = models.ForeignKey(CustomGroup, on_delete=models.CASCADE, related_name='group_chats')
     sender = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    receivers = models.ManyToManyField(CustomUser, related_name='received_group_chats')
+
     message_content = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"Group: {self.group}, Sender: {self.sender}, Message: {self.message_content[:50]}..."
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            super().save(*args, **kwargs)
+            self.receivers.add(*self.group.members.all())
+
+        else:
+            super().save(*args, **kwargs)

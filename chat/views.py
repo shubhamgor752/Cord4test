@@ -6,7 +6,10 @@ from rest_framework import viewsets, status, serializers
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from chat.serializers import (
-    SendMessageSerializer , EditMessageSerializer , SuggestionMessageSerializer
+    SendMessageSerializer,
+    EditMessageSerializer,
+    SuggestionMessageSerializer,
+    MyConversationSerializer,
 )
 from Register.models import UserProfile
 # from administration.utils import user_information
@@ -15,11 +18,11 @@ import uuid
 from django.utils import timezone
 import random
 from base.message import suggested_messages
+from django.db.models import Q
 
 
 class SendMessageViewSet(viewsets.ViewSet):
 
-  
     permission_classes = (IsAuthenticated,)
     serializer_class = SendMessageSerializer
 
@@ -32,7 +35,7 @@ class SendMessageViewSet(viewsets.ViewSet):
                 receiver_id = request_data.get("receiver")
                 message = request_data.get("message")
                 media = request.data.get("media")
-
+                schedule_time = request_data.get("schedule_time")
 
                 forward_id = request_data.get("forward_id")
 
@@ -79,16 +82,25 @@ class SendMessageViewSet(viewsets.ViewSet):
                 {"status": False, "message": str(e), "data": {}},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
-          
+
+    # find unread message  after find unread message update read true update & list message
     def list(self, request, *args, **kwargs):
         try:
-            conversation_messages = ChatMessage.objects.filter(sender=request.user.userprofile)
-            # print("conversation_messages=======",conversation_messages )
+            # Identify unread messages for the receiver user
+            receiver_profile = request.user.userprofile
+            unread_messages = ChatMessage.objects.filter(receiver=receiver_profile, is_read=False)
+
+            # Update messages as read
+            unread_messages.update(is_read=True)
+
+            # Retrieve conversation messages
+            conversation_messages = ChatMessage.objects.filter(Q(sender=request.user.userprofile) | Q(receiver=request.user.userprofile))
+
             serializer = self.serializer_class(conversation_messages, many=True)
             return Response({"status": True, "message": "Conversation found successfully", "data":serializer.data}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"status": False, "message": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
+
     def destroy(self, request, pk=None):
         try:
             message = ChatMessage.objects.get(pk=pk)
@@ -101,7 +113,7 @@ class SendMessageViewSet(viewsets.ViewSet):
             return Response({"status": False, "message": "Message not found"}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({"status": False, "message": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-       
+
 
 class EditMessageViewSet(viewsets.ViewSet):
     permission_classes = (IsAuthenticated,)
@@ -159,7 +171,7 @@ class EditMessageViewSet(viewsets.ViewSet):
                 {"status": False, "message": str(e), "data": {}},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
-        
+
 
 class SuggestMessageViewSet(viewsets.ViewSet):
     permission_classes = (IsAuthenticated,)
@@ -196,3 +208,29 @@ class SuggestMessageViewSet(viewsets.ViewSet):
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class MyconversationViewSet(viewsets.ViewSet):
+    serializer_class = MyConversationSerializer
+    def list(self, request):
+        try:
+            # Identify unread messages for the receiver user
+            receiver_profile = request.user.userprofile
+            unread_messages = ChatMessage.objects.filter(receiver=receiver_profile, is_read=False)
+
+            sender_profile = request.user.userprofile
+            conversation_messages = ChatMessage.objects.filter(Q(sender=sender_profile))
+
+            if not conversation_messages:
+                return Response(
+                    {
+                        "status": True,
+                        "message": "No conversation with any user",
+                    },
+                    status=status.HTTP_200_OK,
+                )
+
+            serializer = self.serializer_class(conversation_messages, many=True)
+            return Response({"status": True, "message": "Conversation found successfully", "data":serializer.data}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"status": False, "message": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

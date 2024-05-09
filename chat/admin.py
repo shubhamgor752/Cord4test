@@ -3,7 +3,6 @@ from .models import ChatMessage
 # Register your models here.
 
 
-
 # admin.site.register(ChatMessage)
 
 
@@ -21,7 +20,8 @@ class Userchat(admin.ModelAdmin):
         "receiver",
         "message",
         "suggested_message",
-        "forwarded_by"
+        "forwarded_by",
+        "is_read",
     )
 
 

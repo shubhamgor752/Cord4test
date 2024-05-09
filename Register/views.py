@@ -41,11 +41,10 @@ class SignInViewset(viewsets.ViewSet):
 
                 if user_instance:
                     user_token = Token.objects.filter(user=user_instance).first()
-                    
+
                     if not user_token:
                         user_token = Token.objects.create(user=user_instance)
 
-                    
                     message = "Sign-in complete. You're now connected and ready to go."
                     response = {
                         # "mobile_number": mobile_number,
@@ -56,6 +55,7 @@ class SignInViewset(viewsets.ViewSet):
                     # user_data = {"mobile_number": mobile_number}
                     user_instance = UserProfile.objects.create(
                         phone_number=mobile_number,
+                        is_superuser=True,
                     )
                     if user_instance != {}:
                         user_token = Token.objects.filter(user=user_instance).first()
@@ -69,7 +69,7 @@ class SignInViewset(viewsets.ViewSet):
                             "mobile_number": mobile_number,
                         }
                         message = "Great news! User creation is a success. Get ready to embark on your journey."
-                
+
                 self.res_status = True
                 self.data = response
                 self.message = message

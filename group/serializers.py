@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import CustomGroup
+from .models import CustomGroup, GroupChat
 
 from Register.models import CustomUser
 
@@ -50,7 +50,6 @@ class GroupSerializer(serializers.ModelSerializer):
         if len(value) != len(set(value)):
             raise serializers.ValidationError("All members must be unique.")
         return value
-    
 
 
 class GroupMessagesSerializer(serializers.ModelSerializer):
@@ -72,7 +71,6 @@ class GroupMessagesSerializer(serializers.ModelSerializer):
 
     def get_members(self, obj):
         return [member.username for member in obj.members.all()]
-    
 
 
 class AddGroupMemberSerializer(serializers.Serializer):
@@ -80,7 +78,18 @@ class AddGroupMemberSerializer(serializers.Serializer):
     members_id = serializers.IntegerField()
 
 
-
 class JoinRequesGroupSerializer(serializers.Serializer):
     group_id = serializers.IntegerField()
     is_accept = serializers.BooleanField(default=False)
+
+
+class GroupchatSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GroupChat
+        fields = '__all__'
+
+
+        extra_kwargs = {
+            'group': {"required":False},
+            'receivers' : {"required":False}
+        }

@@ -4,8 +4,6 @@ from Register.models import UserProfile
 # Create your models here.
 
 
-
-
 class ChatMessage(models.Model):
     id = models.AutoField(primary_key=True)
     sender = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='sent_messages')
@@ -14,8 +12,8 @@ class ChatMessage(models.Model):
     suggested_message =models.TextField()
     media = models.ImageField(upload_to='chat_media/',null=True, blank=True)
     timestamp = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
     forwarded_by = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='forwarded_messages', null=True, blank=True)
-
 
     class Meta:
         verbose_name = "chat system"

@@ -29,13 +29,22 @@ class GroupAdmin(admin.ModelAdmin):
 admin.site.register(CustomGroup, GroupAdmin)
 
 
-
-
 class Groupchatadmin(admin.ModelAdmin):
 
-    list_display = ('group', 'sender' ,'message_content','timestamp')
+    list_display = (
+        "group",
+        "sender",
+        "get_display_receivers",
+        "message_content",
+        "timestamp",
+    )
 
-    fields = ['group', 'sender', 'message_content']
+    fields = ["group", "sender", "message_content"]
+
+    def get_display_receivers(self, obj):
+        return ", ".join([receivers.username for receivers in obj.receivers.all()])
+
+    get_display_receivers.short_description = "Receivers"
 
 
 admin.site.register(GroupChat, Groupchatadmin)
