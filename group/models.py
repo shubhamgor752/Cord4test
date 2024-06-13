@@ -36,3 +36,4 @@ class GroupChat(models.Model):
 
         else:
             super().save(*args, **kwargs)
+

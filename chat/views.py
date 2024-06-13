@@ -19,7 +19,11 @@ from django.utils import timezone
 import random
 from base.message import suggested_messages
 from django.db.models import Q
+from datetime import datetime, timedelta
+from chat.tasks import send_scheduled_message
+import logging
 
+logger = logging.getLogger(__name__)
 
 class SendMessageViewSet(viewsets.ViewSet):
 
@@ -86,18 +90,30 @@ class SendMessageViewSet(viewsets.ViewSet):
     # find unread message  after find unread message update read true update & list message
     def list(self, request, *args, **kwargs):
         try:
-            # Identify unread messages for the receiver user
             receiver_profile = request.user.userprofile
-            unread_messages = ChatMessage.objects.filter(receiver=receiver_profile, is_read=False)
+            unread_messages = ChatMessage.objects.filter(receiver=receiver_profile)
 
-            # Update messages as read
+            if not unread_messages:
+                return Response({"message":"No Pedning message right now"})
             unread_messages.update(is_read=True)
 
             # Retrieve conversation messages
-            conversation_messages = ChatMessage.objects.filter(Q(sender=request.user.userprofile) | Q(receiver=request.user.userprofile))
+            conversation_messages = ChatMessage.objects.filter(
+                Q(receiver=request.user.userprofile)
+            )
+            if not conversation_messages:
+                return Response(
+                    {
+                        "status": True,
+                        "message": "No conversation with any user",
+                    },
+                    status=status.HTTP_200_OK,
+                )
 
-            serializer = self.serializer_class(conversation_messages, many=True)
-            return Response({"status": True, "message": "Conversation found successfully", "data":serializer.data}, status=status.HTTP_200_OK)
+            serializer = MyConversationSerializer(conversation_messages, many=True)
+
+            return Response({"status": True, "message": "Message found successfully", "data":serializer.data}, status=status.HTTP_200_OK)
+
         except Exception as e:
             return Response({"status": False, "message": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -210,16 +226,12 @@ class SuggestMessageViewSet(viewsets.ViewSet):
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-class MyconversationViewSet(viewsets.ViewSet):
+class conversationViewSet(viewsets.ViewSet):
     serializer_class = MyConversationSerializer
     def list(self, request):
         try:
-            # Identify unread messages for the receiver user
-            receiver_profile = request.user.userprofile
-            unread_messages = ChatMessage.objects.filter(receiver=receiver_profile, is_read=False)
-
-            sender_profile = request.user.userprofile
-            conversation_messages = ChatMessage.objects.filter(Q(sender=sender_profile))
+            sender = request.user.userprofile
+            conversation_messages = ChatMessage.objects.filter(sender=sender)
 
             if not conversation_messages:
                 return Response(
@@ -234,3 +246,102 @@ class MyconversationViewSet(viewsets.ViewSet):
             return Response({"status": True, "message": "Conversation found successfully", "data":serializer.data}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"status": False, "message": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class ScheduledMessageViewSet(viewsets.ViewSet):
+
+    permission_classes = (IsAuthenticated,)
+    serializer_class = SendMessageSerializer
+
+    def create(self, request, *args, **kwargs):
+        try:
+            serializer = self.serializer_class(data=request.data)
+
+            if serializer.is_valid():
+                request_data = serializer.validated_data
+                receiver_id = request_data.get("receiver")
+                message = request_data.get("message")
+                media = request.data.get("media")
+
+                forward_id = request_data.get("forward_id")
+
+                if not receiver_id:
+                    raise serializers.ValidationError("Receiver ID should be present")
+
+                if not message:
+                    raise serializers.ValidationError("Message should be present")
+
+                # Automatically set schedule time to 1 hour from now
+                schedule_time = datetime.now() + timedelta(minutes=2)
+
+                # print("schedule_time==========", schedule_time)
+
+                check = send_scheduled_message.apply_async(
+                    args=[request.user.userprofile.id, receiver_id, message, media],
+                    eta=schedule_time,
+                )
+
+                # Use proper logging
+                print(f"Message scheduled for {schedule_time}: {check}")
+
+                return Response(
+                    {
+                        "status": True,
+                        "message": "Message scheduled successfully",
+                        "data": serializer.data,
+                    },
+                    status=status.HTTP_201_CREATED,
+                    )
+            else:
+                return Response(
+                    {"status": False, "message": serializer.errors, "data": {}},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+        except Exception as e:
+            return Response(
+                {"status": False, "message": str(e), "data": {}},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+
+class PendingMsgViewSet(viewsets.ViewSet):
+    permission_classes = (IsAuthenticated,)
+
+    def list(self, request, *args, **kwargs):
+        try:
+            receiver_profile = request.user.userprofile
+            unread_messages = ChatMessage.objects.filter(
+                receiver=receiver_profile, is_read=False
+            )
+            if not unread_messages:
+                return Response({"message": "No Pedning message right now"})
+            unread_messages.update(is_read=True)
+
+            conversation_messages = ChatMessage.objects.filter(
+                Q(receiver=request.user.userprofile)
+            )
+            if not conversation_messages:
+                return Response(
+                    {
+                        "status": True,
+                        "message": "No conversation with any user",
+                    },
+                    status=status.HTTP_200_OK,
+                )
+
+            serializer = MyConversationSerializer(conversation_messages, many=True)
+
+            return Response(
+                {
+                    "status": True,
+                    "message": "Pending  Message found successfully",
+                    "data": serializer.data,
+                },
+                status=status.HTTP_200_OK,
+            )
+
+        except Exception as e:
+            return Response(
+                {"status": False, "message": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )

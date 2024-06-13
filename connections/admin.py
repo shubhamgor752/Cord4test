@@ -21,7 +21,7 @@ class ConnectionAdmin(admin.ModelAdmin):
     def get_pending_followers(self,obj):
         return ", ".join([pendingfollower.username for pendingfollower in obj.pending_followers.all()])
     
-    get_pending_followers.short_description="Pending Followers" 
+    get_pending_followers.short_description="Pending Requests" 
 
 
 

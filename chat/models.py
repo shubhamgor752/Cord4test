@@ -15,6 +15,8 @@ class ChatMessage(models.Model):
     is_read = models.BooleanField(default=False)
     forwarded_by = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='forwarded_messages', null=True, blank=True)
 
+    # scheduled_time = models.DateTimeField(auto_now_add=False)
+
     class Meta:
         verbose_name = "chat system"
         verbose_name_plural = "chat systems"

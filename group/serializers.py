@@ -83,13 +83,44 @@ class JoinRequesGroupSerializer(serializers.Serializer):
     is_accept = serializers.BooleanField(default=False)
 
 
-class GroupchatSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = GroupChat
-        fields = '__all__'
+# class GroupchatSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = GroupChat
+#         fields = '__all__'
 
 
-        extra_kwargs = {
-            'group': {"required":False},
-            'receivers' : {"required":False}
-        }
+#         extra_kwargs = {
+#             'group': {"required":False},
+#             'receivers' : {"required":False}
+#         }
+
+class GroupchatSerializer(serializers.Serializer):
+    group_id = serializers.IntegerField()
+    message = serializers.CharField()
+
+
+class GroupMessageListSerialzers(serializers.Serializer):
+    group_id = serializers.SerializerMethodField()
+    group_name = serializers.SerializerMethodField()
+    sender = serializers.SerializerMethodField()
+    receivers = serializers.SerializerMethodField()
+    message = serializers.SerializerMethodField()
+    timestamp = serializers.SerializerMethodField()
+
+    def get_sender(self, obj):
+        return obj.sender.username
+
+    def get_receivers(self, obj):
+        return [receiver.username for receiver in obj.receivers.all()]
+
+    def get_message(self, obj):
+        return obj.message_content
+
+    def get_group_id(self, obj):
+        return obj.group.id
+
+    def get_group_name(self, obj):
+        return obj.group.group_name
+    
+    def get_timestamp(self, obj):
+        return obj.timestamp

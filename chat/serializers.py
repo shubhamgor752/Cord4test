@@ -1,12 +1,17 @@
 from rest_framework import serializers
 from chat.models import ChatMessage
 from .models import UserProfile  # Import the UserProfile mod
+
+
 class SendMessageSerializer(serializers.Serializer):
+    # sender = serializers.SerializerMethodField()
     receiver = serializers.CharField(required=False, help_text="ID of user")
     message = serializers.CharField(required=False, help_text="Message")
     forward_id = serializers.CharField(required=False, help_text="Forword message ")
     media = serializers.ImageField(required=False, help_text="Media attachment")
     schedule_time = serializers.DateTimeField(required=False)
+
+    # extra_kwargs = {"sender": {"required": False}}
 
     #   for message edit
     message_id = serializers.CharField(required=False, help_text="ID of message")
@@ -21,6 +26,9 @@ class SendMessageSerializer(serializers.Serializer):
         if not any([message, media]):
             raise serializers.ValidationError("Message, attachment or post should be present")
         return fields
+
+    # def get_sender(self,obj):
+    #     return obj.sender.first_name
 
 
 class EditMessageSerializer(serializers.Serializer):

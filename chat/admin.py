@@ -13,6 +13,8 @@ class Userchat(admin.ModelAdmin):
         # "media",
         "message",
         "forwarded_by",
+        "is_read",
+        # "scheduled_time",
     ]
     list_display = (
         "id",
@@ -22,6 +24,7 @@ class Userchat(admin.ModelAdmin):
         "suggested_message",
         "forwarded_by",
         "is_read",
+        # "scheduled_time",
     )
 
 

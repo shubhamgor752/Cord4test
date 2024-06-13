@@ -48,8 +48,8 @@ class UserProfileInfo(serializers.ModelSerializer):
 
 
 class CustomUserSerializer(serializers.Serializer):
-    username = serializers.CharField(validators=USERNAME_VALIDATORS)
     id = serializers.CharField(required=False)
+    username = serializers.CharField(validators=USERNAME_VALIDATORS)
     first_name = serializers.CharField(required=False)
     phone_number = serializers.CharField(
         required=True,

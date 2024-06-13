@@ -1,9 +1,17 @@
 from django.urls import path
 from rest_framework.routers import DefaultRouter
-from .views import (GroupViewSet , RemoveMeberViewSet ,
- MyGroupViewSet ,GroupMemberViewSet ,
- GroupEditViewSet ,AddGrpMemberViewSet , 
- AcceptjoinGrpViewSet , AdminTranserViewSet , AccoutSwitch )
+from .views import (
+    GroupViewSet,
+    RemoveMeberViewSet,
+    MyGroupViewSet,
+    GroupMemberViewSet,
+    GroupEditViewSet,
+    AddGrpMemberViewSet,
+    AcceptjoinGrpViewSet,
+    AdminTranserViewSet,
+    AccoutSwitch,
+    GroupchatViewSet,
+)
 
 router = DefaultRouter()
 
@@ -20,6 +28,8 @@ router.register('request/group',AcceptjoinGrpViewSet, basename='acceptjoingrp')
 router.register('another/admin', AdminTranserViewSet , basename='admincreate')
 
 router.register('private/public', AccoutSwitch , basename='accountswitch' )
+
+router.register('group/chat', GroupchatViewSet, basename='groupchat')
 
 
 urlpatterns += router.urls

@@ -1,51 +1,35 @@
+# tasks.py
+import logging
 from celery import shared_task
-from datetime import datetime, time, timedelta
-from Register.models import CustomUser
-from .views import SendMessageViewSet
+from django.utils import timezone
+from .models import ChatMessage
 
-
-# @shared_task
-# def send_daily_message():
-#     users = CustomUser.objects.all()
-
-#     print(users)
-
-#     send_time = time(hour=11, minute=0, second=0)
-#     today = datetime.now().date()
-#     schedule_time = datetime.combine(today, send_time)
-
-#     if schedule_time < datetime.now():
-#         schedule_time += timedelta(days=1)
-
-#     for user in users:
-#         SendMessageViewSet().create(
-#             request=None,
-#             receiver=user.id,
-#             message="Your scheduled message here",
-#             schedule_time=schedule_time,
-#         )
+logger = logging.getLogger(__name__)
 
 
 @shared_task
-def send_daily_message():
-    users = CustomUser.objects.all()
+def send_scheduled_message(sender_id, receiver_id, message, media):
+    try:
+        # Log task start
+        logger.info("Sending scheduled message task started")
 
-    print(users)
-
-    today = datetime.now().date()
-
-    for user in users:
-        SendMessageViewSet().create(
-            request=None,
-            receiver=user.id,
-            message="Your scheduled message here",
-            schedule_time=today,  # Sending on the same day
+        # Create ChatMessage instance
+        scheduled_message = ChatMessage.objects.create(
+            sender_id=sender_id,
+            receiver_id=receiver_id,
+            message=message,
+            media=media,
+            # scheduled_time will be set automatically
         )
 
+        # Log message creation
+        logger.info(f"Message saved: {scheduled_message}")
 
+        # Log task completion
+        logger.info("Sending scheduled message task completed")
 
-# @shared_task
-# def process_daily_message():
-#     users = CustomUser.objects.all()
-
-#     for user in users:
+        return scheduled_message
+    except Exception as e:
+        # Log any exceptions
+        logger.error(f"Error saving message: {e}")
+        return None

@@ -20,6 +20,7 @@ from django.http import JsonResponse
 from django.core.serializers import serialize
 import json
 from django.core.exceptions import ValidationError
+from custom_pagination import CustomPagination
 
 
 class SignInViewset(viewsets.ViewSet):
@@ -69,14 +70,15 @@ class SignInViewset(viewsets.ViewSet):
                             "mobile_number": mobile_number,
                         }
                         message = "Great news! User creation is a success. Get ready to embark on your journey."
-
-                self.res_status = True
-                self.data = response
-                self.message = message
-                return Response(
-                    {"status": self.res_status, "message": self.message, "data": self.data},
-                    status=status.HTTP_201_CREATED,
-                )
+            else:
+                return Response({"message":"Invalid otp"})
+            self.res_status = True
+            self.data = response
+            self.message = message
+            return Response(
+                {"status": self.res_status, "message": self.message, "data": self.data},
+                status=status.HTTP_201_CREATED,
+            )
 
         return Response(
             {
@@ -150,7 +152,7 @@ class UserViewset(viewsets.ViewSet):
 
     def retrieve(self, request, pk: str = None):
         try:
-            user_obj = get_object_or_404(UserProfile, username=pk)
+            user_obj = get_object_or_404(UserProfile, id=request.user.id)
             response = UserProfileInfo(user_obj, context={"request": request}).data
             message = "User Information"
             return Response(
@@ -197,3 +199,35 @@ class SwitchAccount(viewsets.ViewSet):
             {"status": False, "message": self.message},
             status=status.HTTP_400_BAD_REQUEST,
         )
+
+
+class UserListViewSet(viewsets.ViewSet, CustomPagination):
+
+    serializer_class = CustomUserSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def list(self, request):
+        try:
+            queryset = UserProfile.objects.all()
+            result = self.paginate_queryset(queryset, request, view=self)
+            serializer = self.serializer_class(result, many=True)
+            serialize_data = serializer.data
+        
+            return self.get_paginated_response(
+                {
+                    "data": serialize_data,
+                    "message": "User List",
+                    "res_status": status.HTTP_200_OK,
+                    "code": HttpResponse.status_code,
+                }
+            )
+        except Exception as e:
+            return Response(
+                {
+                    "status": False,
+                    "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    "message": str(e),
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+        

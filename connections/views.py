@@ -88,7 +88,7 @@ class FollowRequestView(viewsets.ViewSet):
                 {"status": False, "message": "An error occurred", "data": {}},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
-        
+
 # this api user followback
 class FollowbackView(viewsets.ViewSet):
     serializer_class = FolloweSerializer
@@ -144,10 +144,8 @@ class FollowbackView(viewsets.ViewSet):
                 {"status": False, "message": "An error occurred", "data": {}},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
-                
-            
 
-    
+
 @permission_classes([IsAuthenticated])
 class AcceptFollowRequestView(APIView):
     def post(self, request):
@@ -197,5 +195,72 @@ class AcceptFollowRequestView(APIView):
             print(e)
             return Response(
                 {"status": False, "message": "An error occurred"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+
+class MyfollowerListView(viewsets.ViewSet):
+    permission_classes = (IsAuthenticated,)
+
+    def list(self, request, *args, **kwargs):
+        try:
+            user = request.user
+            username_query = request.GET.get("followers", None)
+
+            follower_obj = Connection.objects.filter(user=user)
+            followers = []
+
+            for connection in follower_obj:
+                for follower in connection.followers.all():
+                    if username_query:
+                        if username_query.lower() in follower.username.lower():
+                            followers.append({
+                                "username": follower.username,
+                            })
+                    else:
+                        followers.append({
+                            "username": follower.username,
+                        })
+
+            return Response({
+                "status": True,
+                "message": "Followers list",
+                "data": followers
+            }, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response(
+                {"status": False, "message": "An error occurred", "data": {}},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+
+class MyFollowingListView(viewsets.ViewSet):
+    permission_classes = (IsAuthenticated,)
+
+    def list(self, request, *args, **kwargs):
+        try:
+            user = request.user
+            username_query = request.GET.get("following", None)
+
+            following_obj = Connection.objects.filter(user=user)
+            following = []
+
+            for connection in following_obj:
+                for followingg in connection.following.all():
+                    if username_query:
+                        if username_query.lower() in followingg.username.lower():
+                            following.append({"username": followingg.username})
+                    else:
+                        following.append({"username": followingg.username})
+
+            return Response(
+                {"status": True, "message": "Following list", "data": following},
+                status=status.HTTP_200_OK,
+            )
+
+        except Exception as e:
+            return Response(
+                {"status": False, "message": "An error occurred", "data": {}},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )

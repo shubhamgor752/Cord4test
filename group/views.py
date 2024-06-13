@@ -9,6 +9,7 @@ from group.serializers import (
     AddGroupMemberSerializer,
     JoinRequesGroupSerializer,
     GroupchatSerializer,
+    GroupMessageListSerialzers,
 )
 from django.shortcuts import get_object_or_404
 from Register.models import UserProfile,CustomUser
@@ -134,20 +135,21 @@ class GroupEditViewSet(viewsets.ViewSet):
             if group_obj.group_admins.filter(id=current_user.id).exists():
 
                 group_obj = serializer.save()
+                print("group_obj==============", group_obj)
                 group_obj.save()
                 response = GroupMessagesSerializer(group_obj, context={"request": request}).data
 
                 return Response(
-                    {"status": True, "message": "club updated", "data": response},
+                    {"status": True, "message": "group updated", "data": response},
                     status=status.HTTP_201_CREATED,
                 )
-            
+
             else:
                 return Response(
                     {"status": False, "message": "You are not authorized to edit this group."},
                     status=status.HTTP_403_FORBIDDEN,
                 )
-            
+
         except Exception as e:
             print(e)
             self.message = str(e)
@@ -168,7 +170,6 @@ class MyGroupViewSet(viewsets.ViewSet):
 
         try:
             if not CustomGroup.objects.filter(group_admins=request.user).exists():
-                # If not an admin, return error response
                 return Response(
                     {"status": False, "message": "You are not authorized to perform this action."},
                     status=status.HTTP_403_FORBIDDEN,
@@ -272,16 +273,23 @@ class GroupMemberViewSet(viewsets.ViewSet):
 
                 # admins = group_obj.group_admins.all()
                 # admin_data = [{"id": admin.id, "admin": admin.username} for admin in admins]
+                
 
                 members = group_obj.members.all()
                 member_data = [{"id": member.id, "name": member.username} for member in members]
 
-                response_data = {
-                    # "admins": admin_data,
-                    "members": member_data
-                }
+                return Response({
+                    "status":status.HTTP_200_OK,
+                    "message":"Group member found succesfully",
+                    "data":member_data
+                })
 
-                return Response(response_data, status=status.HTTP_200_OK)
+                # response_data = {
+                #     # "admins": admin_data,
+                #     "members": member_data
+                # }
+
+                # return Response(response_data, status=status.HTTP_200_OK)
 
             else:
                 return Response(
@@ -370,7 +378,6 @@ class AcceptjoinGrpViewSet(viewsets.ViewSet):
     serializer_class = JoinRequesGroupSerializer
     permission_classes = (IsAuthenticated,)
 
-
     def create(self, request):
 
         try:
@@ -384,15 +391,16 @@ class AcceptjoinGrpViewSet(viewsets.ViewSet):
                 member = CustomUser.objects.filter(id=user_id).first()
 
                 admin_user = grp_obj.group_admins.filter(id=user_id).first()
-                
+
+                # print("admin_user===============", admin_user)
+
                 if not grp_obj:
                     message = 'Group not found!'
                     res_status = False
                     return Response({'status': res_status,
                                     'code': status.HTTP_404_NOT_FOUND,
                                     'message': message})
-                
-               
+
                 if grp_obj.is_private:
                     member_obj = grp_obj.members.filter(id=user_id).exists()
                     if member_obj:
@@ -401,16 +409,15 @@ class AcceptjoinGrpViewSet(viewsets.ViewSet):
                         return Response({'status': True,
                                         'code': status.HTTP_200_OK,
                                         'message': message})
-                 
 
                     if is_accept:
-# IN THIS CASE WHEN USER REQUEST SEND TO PRIVATE GROUP AFTER AGAIN CALL THIS API 
+                        # IN THIS CASE WHEN USER REQUEST SEND TO PRIVATE GROUP AFTER AGAIN CALL THIS API
                         if admin_user is None:
                             return Response(
                                 {"status": False, "message": "You are not authorized to perform this action."},
                                 status=status.HTTP_403_FORBIDDEN,
                             )
-# ========================================== GROUP ADMIN ACCESS================================================================================
+                        # ========================================== GROUP ADMIN ACCESS================================================================================
                         if user_id==admin_user.id:
                             request_checks = grp_obj.join_requests.all()
                             if request_checks:
@@ -427,7 +434,7 @@ class AcceptjoinGrpViewSet(viewsets.ViewSet):
                                 return Response({'status': res_status,
                                                 'code': status.HTTP_404_NOT_FOUND,
                                                 'message': message})
-                            
+
                         else:
                             message = "Only the group admin can accept join requests."
                             res_status = False
@@ -451,11 +458,18 @@ class AcceptjoinGrpViewSet(viewsets.ViewSet):
                                             'message': message})
                         else:
                             if request.user in grp_obj.group_admins.all():
-                                message = "Group admins cannot send join requests to their own group."
-                                res_status = False
-                                return Response({'status': res_status,
-                                                'code': status.HTTP_404_NOT_FOUND,
-                                                'message': message})
+                                return Response(
+                                    {
+                                        "status": False,
+                                        "status": status.HTTP_400_BAD_REQUEST,
+                                        "message": "Group admins cannot send join requests to their own group.",
+                                    }
+                                )
+                                # message = "Group admins cannot send join requests to their own group."
+                                # res_status = False
+                                # return Response({'status': res_status,
+                                #                 'code': status.HTTP_404_NOT_FOUND,
+                                #                 'message': message})
 
                             join_request = grp_obj.join_requests.add(user_id)
                             message = 'Your request to join this private group has been sent to the admin.'
@@ -471,6 +485,14 @@ class AcceptjoinGrpViewSet(viewsets.ViewSet):
                         return Response({'status': res_status,
                                         'code': status.HTTP_403_FORBIDDEN,
                                         'message': message})
+                    if admin_user:
+                        return Response(
+                            {
+                                "status": False,
+                                "status": status.HTTP_400_BAD_REQUEST,
+                                "message": "Group admins cannot send join requests to their own group.",
+                            }
+                        )
                     grp_obj.members.add(user_id)
                     message = f"{member} has joined {grp_obj.group_name}"
                     res_status = True
@@ -482,7 +504,7 @@ class AcceptjoinGrpViewSet(viewsets.ViewSet):
             return Response({'status': res_status,
                             'code': status.HTTP_400_BAD_REQUEST,
                             'message': message})
-        
+
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)  
 
@@ -541,19 +563,18 @@ class AccoutSwitch(viewsets.ViewSet):
     def create(self, request):
         try:
             group_id = request.data.get("group_id")
-            current_user = get_object_or_404(CustomUser, id = request.user.id)
             group_obj = get_object_or_404(CustomGroup, id=group_id)
+            current_user = request.user
 
-            
             if group_obj.group_admins.filter(id=current_user.id).exists():
-                if group_obj.is_private:
-                    message = "Switched to public"
-                    group_obj.is_private = False
-                else:
-                    message = "Switched to private"
-                    group_obj.is_private = True
+                group_obj.is_private = not group_obj.is_private
                 group_obj.save()
-                
+                message = (
+                    "Switched to public"
+                    if not group_obj.is_private
+                    else "Switched to private"
+                )
+
                 return Response(
                     {
                         "status": True,
@@ -561,30 +582,78 @@ class AccoutSwitch(viewsets.ViewSet):
                     },
                     status=status.HTTP_201_CREATED,
                 )
-            
             else:
                 return Response(
-                    {"status": False, "message": "You are not authorized to edit this group."},
+                    {
+                        "status": False,
+                        "message": "You are not authorized to edit this group.",
+                    },
                     status=status.HTTP_403_FORBIDDEN,
                 )
         except Exception as e:
-            self.message = str(e)
+            return Response(
+                {"status": False, "message": str(e)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
-        return Response(
-            {"status": False, "message": self.message},
-            status=status.HTTP_400_BAD_REQUEST,
-        )
+
+
+# this api group mesg & save in db this type message = {username}:{message}
+# def create(self, request):
+#     serializer = self.serializer_class(data=request.data)
+
+#     if serializer.is_valid():
+#         validated_data = dict(serializer.validated_data)
+#         user = request.user
+#         group_id = validated_data.get("group_id")
+#         message = validated_data.get("message")
+#         # media = request.data.get("media")
+#         group_obj = get_object_or_404(CustomGroup, id=group_id)
+#         if group_obj.group_admins.filter(id=user.id).exists():
+#             group_chat = GroupChat.objects.filter(group=group_obj).first()
+#             print("group_chat===========", group_chat)
+
+#             if group_chat:
+#                 new_message_content = (
+#                     f"{group_chat.message_content}\n{user.username}: {message}"
+#                 )
+#                 group_chat.message_content = new_message_content
+#                 group_chat.save()
+#             else:
+#                 GroupChat.objects.create(
+#                     message_content=f"{user.username}:{message}", group=group_obj
+#                 )
+#             self.res_status = True
+#             self.data = {
+#                 "status": self.res_status,
+#                 "message": "Message sent successfully",
+#             }
+#             return Response(self.data, status=status.HTTP_201_CREATED)
+#         else:
+#             print("33333333333333")
+#             self.res_status = False
+#             self.data = {
+#                 "status": self.res_status,
+#                 "message": "You are not a admin of this group",
+#             }
+#             return Response(self.data, status=status.HTTP_403_FORBIDDEN)
+#     else:
+#         self.res_status = False
+#         self.data = {
+#             "status": self.res_status,
+#             "message": "Invalid data",
+#         }
+#         return Response(self.data, status=status.HTTP_403_FORBIDDEN)
 
 
 # ============================================== group--chat ================================================================
 
+# group-chat in this api only group-admin send message
 
 class GroupchatViewSet(viewsets.ViewSet):
-
     serializer_class = GroupchatSerializer
-
+    permission_classes = (IsAuthenticated,)
     res_status , data  = False , {}
-
 
     def create(self,request):
         serializer = self.serializer_class(data=request.data)
@@ -592,6 +661,66 @@ class GroupchatViewSet(viewsets.ViewSet):
         if serializer.is_valid():
             validated_data = dict(serializer.validated_data)
             user = request.user
+            group_id = validated_data.get("group_id")
+            message = validated_data.get("message")
+            media = request.data.get("media")
+            group_obj = get_object_or_404(CustomGroup, id=group_id)
+            if group_obj.group_admins.filter(id=user.id).exists():
+                group_chat = GroupChat.objects.filter(group=group_obj).first()
+                if group_chat:
+                    new_message_content = f"{group_chat.message_content},{message}"
+                    group_chat.message_content = new_message_content
+                    group_chat.save()
+                else:
+                    GroupChat.objects.create(
+                            sender=user, message_content=message, group=group_obj
+                        )
+                self.res_status = True
+                self.data = {'status': self.res_status,'message': 'Message sent successfully'}
+                return Response(self.data, status=status.HTTP_201_CREATED)
+            else:
+                print("33333333333333")
+                self.res_status = False
+                self.data = {
+                    "status": self.res_status,
+                    "message": "You are not a admin of this group",
+                }
+                return Response(self.data, status=status.HTTP_403_FORBIDDEN)
+        else:
+            self.res_status = False
+            self.data = {
+                "status": self.res_status,
+                "message": "Invalid data",
+            }
+            return Response(self.data, status=status.HTTP_403_FORBIDDEN)
 
-
-#  pendinggggg
+    # this list-api use for mesg-list , it can use both groupadmin and group-member
+    def list(self, request,*args , **kwargs):
+        try:
+            group_id = request.GET.get("group_id")
+            group_obj = get_object_or_404(CustomGroup, id=group_id)
+            is_admin = group_obj.group_admins.filter(id=request.user.id).exists()
+            is_member = group_obj.members.filter(id=request.user.id).exists()
+            if is_admin or is_member:
+                chat_obj = GroupChat.objects.filter(group=group_obj)
+                serializer = GroupMessageListSerialzers(chat_obj, many=True)
+                return Response(
+                    {
+                        "status": True,
+                        "message": "Message list found successfully",
+                        "data": serializer.data,
+                    },
+                    status=status.HTTP_200_OK,
+                )
+            else:
+                self.res_status = False
+                self.data = {
+                    "status": self.res_status,
+                    "message": "You are not an admin or a member of this group",
+                }
+                return Response(self.data, status=status.HTTP_403_FORBIDDEN)
+        except Exception as e:
+            return Response(
+                {"status": False, "message": str(e)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
