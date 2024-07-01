@@ -204,6 +204,8 @@ class RemoveMeberViewSet(viewsets.ViewSet):
         try:
             group_id = request.data.get("group_id", None)
             member_id = request.data.get("member_id", None)
+            if member_id is None:
+                member_id = request.user.id
             current_user_obj = CustomUser.objects.get(id=request.user.id)
 
             if not CustomGroup.objects.filter(id=group_id).exists():
@@ -590,6 +592,40 @@ class AccoutSwitch(viewsets.ViewSet):
                     },
                     status=status.HTTP_403_FORBIDDEN,
                 )
+        except Exception as e:
+            return Response(
+                {"status": False, "message": str(e)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+
+class GroupMemberCheckViewSet(viewsets.ViewSet):
+    permission_classes = (IsAuthenticated,)
+
+    def list(self,request,*args , **kwargs):
+        try:
+            group_id = request.data.get("group_id")
+            group_obj = get_object_or_404(CustomGroup, id=group_id)
+            is_admin = group_obj.group_admins.filter(id=request.user.id).exists()
+            is_member = group_obj.members.filter(id=request.user.id).exists()
+
+            if is_admin or is_member:
+                serializer = GroupMessagesSerializer(group_obj)
+                self.message = 'successfully!'
+                self.res_status = True
+                return Response({'status': self.res_status,
+                            'code': HttpResponse.status_code,
+                            'message': self.message,
+                            'data': serializer.data})
+            else:
+                return Response(
+                    {
+                        "status": False,
+                        "message": "You are not in this group",
+                    },
+                    status=status.HTTP_403_FORBIDDEN,
+                )
+            
         except Exception as e:
             return Response(
                 {"status": False, "message": str(e)},

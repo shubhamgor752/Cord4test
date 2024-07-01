@@ -5,6 +5,16 @@ from Register.models import UserProfile
 
 
 class Connection(models.Model):
+    """
+    AI is creating a summary for Connection.
+
+    Args:
+        ConnectionsModel: A model used for managing follow and following relationships between users.
+
+    Returns:
+        dict: A dictionary containing the summary of connections.
+    """
+
 
     user = models.OneToOneField(UserProfile,on_delete=models.CASCADE)
     followers = models.ManyToManyField(UserProfile,related_name="following",blank=True)

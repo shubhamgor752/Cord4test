@@ -11,6 +11,7 @@ from .views import (
     AdminTranserViewSet,
     AccoutSwitch,
     GroupchatViewSet,
+    GroupMemberCheckViewSet
 )
 
 router = DefaultRouter()
@@ -30,6 +31,8 @@ router.register('another/admin', AdminTranserViewSet , basename='admincreate')
 router.register('private/public', AccoutSwitch , basename='accountswitch' )
 
 router.register('group/chat', GroupchatViewSet, basename='groupchat')
+
+router.register("check/group-member", GroupMemberCheckViewSet , basename="check-member")
 
 
 urlpatterns += router.urls

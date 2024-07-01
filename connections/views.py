@@ -32,6 +32,7 @@ class FollowRequestView(viewsets.ViewSet):
                     first_follower = followers_username[0]  # Get the first follower
                     username = first_follower.username  # Assuming 'username' is the attribute holding the username
 
+
                 follower = UserProfile.objects.filter(username=username).first()
 
                 if not follower:
@@ -55,7 +56,7 @@ class FollowRequestView(viewsets.ViewSet):
                 
                 if follower.is_private == True:
                     connection, created = Connection.objects.get_or_create(user=follower)
-                    connection.pending_followers.add(follower)  # Use set() to update the many-to-many relationship
+                    connection.pending_followers.add(user.id)  # Use set() to update the many-to-many relationship
                 
                     return Response(
                         {"status": True, "message": "Follow request sent successfully"},
@@ -104,10 +105,24 @@ class FollowbackView(viewsets.ViewSet):
 
                 if followers_username:
                     first_follower = followers_username[0]  # Get the first follower
-                    username = first_follower.username 
+                    username = first_follower.username
+                    follow_id = first_follower.id
 
                     user = request.user.userprofile
                     # Iterate over each follower
+
+                    if user.username == username:
+                        return Response(
+                            {"status": False, "message": "You can't follow yourself", "data": {}},
+                            status=status.HTTP_400_BAD_REQUEST,
+                        )
+                    
+                    if Connection.objects.filter(user=user, followers=follow_id).exists():
+                        return Response(
+                            {"status": False, "message": "You are already following this user", "data": {}},
+                            status=status.HTTP_400_BAD_REQUEST,
+                            )
+                        
                     for username in followers_username:
                         if Connection.objects.filter(followers=username).exists():
 

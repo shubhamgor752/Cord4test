@@ -565,7 +565,12 @@ class TickerViewSet(viewsets.ViewSet):
                 available_quantity = validated_data.get("available_quantity")
 
                 event_post = get_object_or_404(EventPost, id=event_id)
-                print(event_post.event_type)
+                
+                if event_post.event_end_date < timezone.now().date():
+                    return Response(
+                        {"message": "This event has already ended."},
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
 
                 if event_post.author != request.user:
                     return Response(

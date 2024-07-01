@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Post, Comment, EventPost, Ticket, TicketPurchase
+from .models import Post, Comment, EventPost, Ticket, TicketPurchase , Poll
 
 # Register your models here.
 
@@ -93,3 +93,14 @@ class tickerpurchaseadmin(admin.ModelAdmin):
     get_event_name.short_description = "Ticket__title"
 
 admin.site.register(TicketPurchase,tickerpurchaseadmin)
+
+
+
+
+class polladmin(admin.ModelAdmin):
+    fields = ["author", "question", "options"]
+    list_display = ["id", "author", "question", "options"]
+
+
+
+admin.site.register(Poll, polladmin)
