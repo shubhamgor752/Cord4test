@@ -1,0 +1,1942 @@
+{
+	"info": {
+		"_postman_id": "aaba190b-eea7-4952-8dc9-9675215a51b8",
+		"name": "User_post_api",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "user-list",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/users/list/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"users",
+								"list",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "user-infomation",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/user/pk/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"user",
+								"pk",
+								""
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "2",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User_register",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"pm.environment.set(\"AUTH_TOKEN\",\"Token\" +' '+jsonData.data.user_token);",
+									"",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "mobile_number",
+									"value": "8140753204",
+									"description": "8140753204 , 9104114400 , 8128634005",
+									"type": "text"
+								},
+								{
+									"key": "otp",
+									"value": "1234",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/signin/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"signin",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User_update",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "MANTHAN_O3",
+									"type": "text"
+								},
+								{
+									"key": "phone_number",
+									"value": "8140753204",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "profession",
+									"value": "Dev",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "date_of_birth",
+									"value": "2002-05-31",
+									"type": "text"
+								},
+								{
+									"key": "first_name",
+									"value": "Test",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "email",
+									"value": "test@gmail.com",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "bio",
+									"value": "gaming",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "last_name",
+									"value": "test last",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/user/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"user",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Username verification",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "shubham33",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/username/verification/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"username",
+								"verification",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Switch_account",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/switch-account/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"switch-account",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Post",
+			"item": [
+				{
+					"name": "MY_post",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/create/post/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"create",
+								"post",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List_Post- follower lis",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/list/post/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"list",
+								"post",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create_post",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "post_title",
+									"value": "addded title field",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "new version",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/create/post/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"create",
+								"post",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "edit_post",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\":\"13\",\n    \"post_title\":\"edit title chehck\",\n    \"description\":\"punjab titance\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/edit/post/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"edit",
+								"post",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete-post",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/create/post/1/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"create",
+								"post",
+								"1",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Event",
+			"item": [
+				{
+					"name": "Event-list",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/event/create/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"event",
+								"create",
+								""
+							],
+							"query": [
+								{
+									"key": "event_location",
+									"value": "Sindhu bhavan , ahmdwwwwwwwwwww",
+									"disabled": true
+								},
+								{
+									"key": "event_type",
+									"value": "paid",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Event_post",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "Box cricket tournamnet",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "checking from postman",
+									"type": "text"
+								},
+								{
+									"key": "event_type",
+									"value": "paid",
+									"type": "text"
+								},
+								{
+									"key": "event_date",
+									"value": "2024-05-23",
+									"type": "text"
+								},
+								{
+									"key": "event_location",
+									"value": "ahmd22222",
+									"type": "text"
+								},
+								{
+									"key": "ticket_price",
+									"value": "110",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/event/create/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"event",
+								"create",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Join-Free-Event",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "event_id",
+									"value": "11",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/join/event/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"join",
+								"event",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Private-event",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "event_id",
+									"value": "12",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/private/event/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"private",
+								"event",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "edit-event",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "event_id",
+									"value": "12",
+									"type": "text"
+								},
+								{
+									"key": "title",
+									"value": "Box cricket leauge ",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "description",
+									"value": "tuff wicket , soft tennis cricket tournament",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "event_end_date",
+									"value": "2024-06-23",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "event_location",
+									"value": "Sindhu bhavan , ahmdwwwwwwwwwww",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/edit/event/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"edit",
+								"event",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "remove-from-event",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "event_id",
+									"value": "11",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/remove/event/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"remove",
+								"event",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete-event",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/event/create/13/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"event",
+								"create",
+								"13",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Send_message",
+			"item": [
+				{
+					"name": "Update- seen mesg",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/pending/message/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"pending",
+								"message",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "My-con -message",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/list/con/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"list",
+								"con",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "who-send-me-mesg",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/message/send/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"message",
+								"send",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "send_message",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "receiver",
+									"value": "8",
+									"type": "text"
+								},
+								{
+									"key": "message",
+									"value": "testing message",
+									"type": "text"
+								},
+								{
+									"key": "forward_id",
+									"value": "12",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "media",
+									"type": "file",
+									"src": "/home/cord4-2/Desktop/profile.jpeg",
+									"disabled": true
+								},
+								{
+									"key": "message_id",
+									"value": "40",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/message/send/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"message",
+								"send",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Edit message",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "message",
+									"value": "is just test for edited messageeeeeeeeeeeee",
+									"type": "text"
+								},
+								{
+									"key": "message_id",
+									"value": "46",
+									"type": "text"
+								},
+								{
+									"key": "receiver",
+									"value": "2",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/message/edit/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"message",
+								"edit",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Suggest_message",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "message_id",
+									"value": "14",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/message/suggest/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"message",
+								"suggest",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Schedule-msg",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "receiver",
+									"value": "8",
+									"type": "text"
+								},
+								{
+									"key": "message",
+									"value": "good morninggggg schedule",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/schedule/messgae/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"schedule",
+								"messgae",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete_msg",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/message/send/38/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"message",
+								"send",
+								"38",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Comment/Like/==Add",
+			"item": [
+				{
+					"name": "comment/create",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "post_id",
+									"value": "13",
+									"type": "text"
+								},
+								{
+									"key": "comment",
+									"value": "nice team , check comment",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/comment/add/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"comment",
+								"add",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Like/post",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "post_id",
+									"value": "1",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/like/send/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"like",
+								"send",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete-comment",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/comment/add/5/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"comment",
+								"add",
+								"5",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Connections",
+			"item": [
+				{
+					"name": "follower-list",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/followers/list/?followers=kathan__09",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"followers",
+								"list",
+								""
+							],
+							"query": [
+								{
+									"key": "followers",
+									"value": "kathan__09"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "following-list",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/following/list/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"following",
+								"list",
+								""
+							],
+							"query": [
+								{
+									"key": "following",
+									"value": "user_o4",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Followrequest",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "followers",
+									"value": "2",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/follow/send/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"follow",
+								"send",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Follow--back",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "followers",
+									"value": "8",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/follow/back/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"follow",
+								"back",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Acceptrequesst",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/acceptfollowrequest",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"acceptfollowrequest"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Ticket",
+			"item": [
+				{
+					"name": "list-ticket",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "event_id",
+									"value": "12",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/ticket/create/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"ticket",
+								"create",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Ticket-order-history",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/ticket-order/history/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"ticket-order",
+								"history",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Ticket-create",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "event_id",
+									"value": "12",
+									"type": "text"
+								},
+								{
+									"key": "ticket_price",
+									"value": "450",
+									"type": "text"
+								},
+								{
+									"key": "available_quantity",
+									"value": "22",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/ticket/create/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"ticket",
+								"create",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "purchase-ticket",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "ticket",
+									"value": "15",
+									"type": "text"
+								},
+								{
+									"key": "quantity",
+									"value": "4",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/ticker/purchase/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"ticker",
+								"purchase",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Edit-ticket",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "ticket_price",
+									"value": "350",
+									"type": "text"
+								},
+								{
+									"key": "available_quantity",
+									"value": "25",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/ticket/create/4/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"ticket",
+								"create",
+								"4",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "cancel-ticket",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/ticker/purchase/16/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"ticker",
+								"purchase",
+								"16",
+								""
+							],
+							"query": [
+								{
+									"key": "ticket_id",
+									"value": "16",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Group",
+			"item": [
+				{
+					"name": "My--Group",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/my/group/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"my",
+								"group",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create_Group",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"group_name\":\"Cricket_11\",\n    \"members\": [\n       \"3\", \"4\", \"8\"\n    ],\n    \"is_private\": \"false\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/create/group/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"create",
+								"group",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove-member",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "group_id",
+									"value": "30",
+									"type": "text"
+								},
+								{
+									"key": "member_id",
+									"value": "8",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/remove/member/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"remove",
+								"member",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Edit-Group",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\":\"30\",\n    \"group_name\":\"Mumbai_afssfasfIndians\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/group/edit/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"group",
+								"edit",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "check-group-members",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "group_id",
+									"value": "30",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/group/member/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"group",
+								"member",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add-member",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"group_id\":\"22\",\n    \"members_id\":\"4\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/add/member/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"add",
+								"member",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Private-grp_request",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "group_id",
+									"value": "30",
+									"type": "text"
+								},
+								{
+									"key": "is_accept",
+									"value": "True",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/request/group/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"request",
+								"group",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create-another-admin",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "group_id",
+									"value": "22",
+									"type": "text"
+								},
+								{
+									"key": "member_id",
+									"value": "2",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/another/admin/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"another",
+								"admin",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Swich-account",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "group_id",
+									"value": "22",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/private/public/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"private",
+								"public",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete-grp",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/create/group/22/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"create",
+								"group",
+								"22",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "check-member-list",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "group_id",
+									"value": "30",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/check/group-member/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"check",
+								"group-member",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Group-chat",
+			"item": [
+				{
+					"name": "send-mesg",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "group_id",
+									"value": "22",
+									"type": "text"
+								},
+								{
+									"key": "message",
+									"value": "hello  second message",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/group/chat/",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"group",
+								"chat",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "chat-list",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/group/chat/?group_id=22",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"group",
+								"chat",
+								""
+							],
+							"query": [
+								{
+									"key": "group_id",
+									"value": "22"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
