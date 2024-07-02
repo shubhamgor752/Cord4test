@@ -17,7 +17,7 @@ admin.site.register(Post,postadmin)
 
 
 class commentadmin(admin.ModelAdmin):
-    fields = ["posttitle","comment","author"]
+    fields = ["post","comment","author"]
 
     list_display = ["id","get_post_name", "comment", "author"]
 
