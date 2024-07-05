@@ -29,11 +29,10 @@ class GroupViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated,]
     res_status, data, message = False, None, 'Invalid request'
 
-
     def create(self, request):
         serializer = self.serializer_class(data=request.data)
         group_admin = CustomUser.objects.filter(id=request.user.id).first()
-        
+
         if serializer.is_valid():
             validated_data = serializer.validated_data
             group_name = validated_data.get("group_name")
@@ -48,10 +47,10 @@ class GroupViewSet(viewsets.ViewSet):
                         'code': HttpResponse.status_code,
                         'message': self.message,
                         'data': self.data})
-            
+
             new_group = CustomGroup.objects.create(group_name=group_name, is_private=is_private)
             new_group.group_admins.add(group_admin)
-            
+
             member_ids = []
             if isinstance(members, list):
                 for member_username in members:
@@ -62,36 +61,38 @@ class GroupViewSet(viewsets.ViewSet):
                 member = CustomUser.objects.filter(username=members).first()
                 if member and member != group_admin:
                     member_ids.append(member.id)
-            
+
             for member_id in member_ids:
                 new_group.members.add(member_id)
             new_group.save()
 
             self.message = 'Group created successfully!'
             self.res_status = True
-            return Response({'status': self.res_status,
-                        'code': HttpResponse.status_code,
-                        'message': self.message,
-                        'data': GroupSerializer(new_group).data})
+            group_data = GroupMessagesSerializer(new_group).data
+            return Response(
+                {
+                    "status": self.res_status,
+                    "code": HttpResponse.status_code,
+                    "message": self.message,
+                    "data": group_data,
+                }
+            )
         else:   
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
-
 
     # def list(self,request):
-        # queryset = Group.objects.filter(group_admins=request.user)
+    # queryset = Group.objects.filter(group_admins=request.user)
 
-        # serializer = GroupSerializer(queryset,many=True)
-        # self.message = 'Group fetched successfully'
-        # self.res_status = True
-        # self.data = serializer.data
-        # self.count = queryset.count()
+    # serializer = GroupSerializer(queryset,many=True)
+    # self.message = 'Group fetched successfully'
+    # self.res_status = True
+    # self.data = serializer.data
+    # self.count = queryset.count()
 
-        # return Response({'data': self.data,
-        #                 'message': self.message,
-                        # 'res_status': self.res_status,
-                        # 'code': HttpResponse.status_code})
-
+    # return Response({'data': self.data,
+    #                 'message': self.message,
+    # 'res_status': self.res_status,
+    # 'code': HttpResponse.status_code})
 
     def destroy(self, request, pk=None):
         try:
@@ -631,7 +632,6 @@ class GroupMemberCheckViewSet(viewsets.ViewSet):
                 {"status": False, "message": str(e)},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-
 
 
 # this api group mesg & save in db this type message = {username}:{message}
