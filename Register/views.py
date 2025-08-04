@@ -21,7 +21,8 @@ from django.core.serializers import serialize
 import json
 from django.core.exceptions import ValidationError
 from custom_pagination import CustomPagination, CustomPaginationnnnn
-
+from .models import UserProfile, OTPRequest
+from .utils import generate_otp, send_otp_via_twilio
 
 class SignInViewset(viewsets.ViewSet):
     serializer_class = UserSignUpSerializer
@@ -31,63 +32,61 @@ class SignInViewset(viewsets.ViewSet):
     def create(self, request):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
-            mobile_number = dict(serializer.validated_data)["mobile_number"]
-            otp = (
-                dict(serializer.validated_data)["otp"]
-                if "otp" in dict(serializer.validated_data).keys()
-                else None
-            )
-            if otp and otp == 1234:
-                user_instance = UserProfile.objects.filter(phone_number=mobile_number).first()
+            mobile_number = serializer.validated_data["mobile_number"]
+            otp = serializer.validated_data.get("otp")
 
-                if user_instance:
-                    user_token = Token.objects.filter(user=user_instance).first()
+            if not otp:
+                # Step 1: Send OTP using Twilio
+                generated_otp = generate_otp()
+                OTPRequest.objects.create(mobile_number=mobile_number, otp=generated_otp)
+                send_otp_via_twilio(mobile_number, generated_otp)
 
-                    if not user_token:
-                        user_token = Token.objects.create(user=user_instance)
+                return Response({
+                    "status": True,
+                    "message": "OTP has been sent to your mobile number."
+                }, status=status.HTTP_200_OK)
 
-                    message = "Sign-in complete. You're now connected and ready to go."
-                    response = {
-                        # "mobile_number": mobile_number,
-                        "user_token": user_token.key,
-                        "user": UserProfileInfo(user_instance).data,
-                    }
-                else:
-                    # user_data = {"mobile_number": mobile_number}
-                    user_instance = UserProfile.objects.create(
-                        phone_number=mobile_number,
-                        is_superuser=True,
-                    )
-                    if user_instance != {}:
-                        user_token = Token.objects.filter(user=user_instance).first()
-                        if not user_token:
-                            user_token = Token.objects.create(user=user_instance)
-                        # else:
-                        #     Token.objects.get(user=user_obj).delete()
-                        #     user_token = Token.objects.create(user=user_obj)
-                        response = {
-                            "user_token": user_token.key,
-                            "mobile_number": mobile_number,
-                        }
-                        message = "Great news! User creation is a success. Get ready to embark on your journey."
+            # Step 2: Verify OTP
+            otp_instance = OTPRequest.objects.filter(mobile_number=mobile_number, otp=otp).order_by("-created_at").first()
+            if not otp_instance or otp_instance.is_expired():
+                return Response({"message": "Invalid or expired OTP"}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Step 3: Proceed with user login or registration
+            user_instance = UserProfile.objects.filter(phone_number=mobile_number).first()
+
+            if user_instance:
+                user_token = Token.objects.get_or_create(user=user_instance)[0]
+                response = {
+                    "user_token": user_token.key,
+                    "user": UserProfileInfo(user_instance).data,
+                }
+                message = "Sign-in complete. You're now connected and ready to go."
             else:
-                return Response({"message":"Invalid otp"})
+                user_instance = UserProfile.objects.create(
+                    phone_number=mobile_number,
+                    is_superuser=True,
+                )
+                user_token = Token.objects.create(user=user_instance)
+                response = {
+                    "user_token": user_token.key,
+                    "mobile_number": mobile_number,
+                }
+                message = "Great news! User creation is a success."
+
             self.res_status = True
             self.data = response
             self.message = message
-            return Response(
-                {"status": self.res_status, "message": self.message, "data": self.data},
-                status=status.HTTP_201_CREATED,
-            )
 
-        return Response(
-            {
+            return Response({
                 "status": self.res_status,
-                "code": HttpResponse.status_code,
                 "message": self.message,
-                # "data": self.data,
-            }
-        )
+                "data": self.data,
+            }, status=status.HTTP_201_CREATED)
+
+        return Response({
+            "status": self.res_status,
+            "message": self.message,
+        }, status=status.HTTP_400_BAD_REQUEST)
 
 class UserViewset(viewsets.ViewSet):
     serializer_class = CustomUserSerializer
@@ -234,3 +233,31 @@ class UserListViewSet(viewsets.ViewSet, CustomPagination):
                 },
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
+
+
+
+
+
+class LogoutViewset(viewsets.ViewSet):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def create(self, request):  # POST /logout/
+        user = request.user
+
+        # Check if token exists for the user
+        token_qs = Token.objects.filter(user=user)
+        if not token_qs.exists():
+            # Token already deleted (probably on previous logout)
+            return Response({
+                "status": False,
+                "message": "Please login first."
+            }, status=status.HTTP_401_UNAUTHORIZED)
+
+        # Delete token (first-time logout)
+        token_qs.delete()
+
+        return Response({
+            "status": True,
+            "message": "You have been successfully logged out. Token has been deleted."
+        }, status=status.HTTP_200_OK)

@@ -1,6 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser , AbstractBaseUser
 import uuid
+from django.utils import timezone
+from datetime import timedelta
+
 
 # Create your models here.
 PROFILE_IMAGE = "profile.jpeg"
@@ -34,3 +37,13 @@ class UserProfile(CustomUser):
             return self.first_name
         else:
             return self.username
+
+
+
+class OTPRequest(models.Model):
+    mobile_number = models.CharField(max_length=15)
+    otp = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def is_expired(self):
+        return timezone.now() > self.created_at + timedelta(minutes=300)

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from Register.models import UserProfile, CustomUser
+from Register.models import UserProfile, CustomUser , OTPRequest
 
 
 class CustomUserAdmin(admin.ModelAdmin):
@@ -13,6 +13,16 @@ class CustomUserAdmin(admin.ModelAdmin):
 
 admin.site.register(CustomUser, CustomUserAdmin)
 
+
+class CustomOtpAdmin(admin.ModelAdmin):
+    list_display = ["mobile_number", "otp", "created_at"]
+    fields = [
+        "mobile_number",
+        "otp",
+        "created_at",
+    ]
+
+admin.site.register(OTPRequest , CustomOtpAdmin)
 
 class UserProfileAdmin(admin.ModelAdmin):
     fields = [
@@ -40,3 +50,5 @@ class UserProfileAdmin(admin.ModelAdmin):
 
 
 admin.site.register(UserProfile, UserProfileAdmin)
+
+

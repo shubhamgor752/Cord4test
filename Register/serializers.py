@@ -8,6 +8,7 @@ from django.core.validators import (
 from .models import UserProfile
 from rest_framework.response import Response
 
+
 # import re
 USERNAME_VALIDATORS = [
     MinLengthValidator(4, "Username must be at least 4 characters long"),   
