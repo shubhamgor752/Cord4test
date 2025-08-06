@@ -60,7 +60,7 @@ class SignInViewset(viewsets.ViewSet):
                         "message": "Invalid PIN.",
                     }, status=status.HTTP_401_UNAUTHORIZED)
 
-            # ❌ If user has PIN but no PIN sent → force PIN login
+            #  If user has PIN but no PIN sent → force PIN login
             if user_instance and user_instance.pin and not pin and not otp:
                 return Response({
                     "status": False,
