@@ -11,7 +11,8 @@ from Register.serializers import (
     CustomUserSerializer,
     UserProfileInfo,
     USERNAME_VALIDATORS,
-    LocationSerializer
+    LocationSerializer,
+    SetPinSerializer
 )
 from django.shortcuts import get_object_or_404
 from Register.models import CustomUser
@@ -23,6 +24,8 @@ from django.core.exceptions import ValidationError
 from custom_pagination import CustomPagination, CustomPaginationnnnn
 from .models import UserProfile, OTPRequest
 from .utils import generate_otp, send_otp_via_twilio
+from django.contrib.auth.hashers import make_password , check_password
+
 
 class SignInViewset(viewsets.ViewSet):
     serializer_class = UserSignUpSerializer
@@ -34,6 +37,35 @@ class SignInViewset(viewsets.ViewSet):
         if serializer.is_valid():
             mobile_number = serializer.validated_data["mobile_number"]
             otp = serializer.validated_data.get("otp")
+            pin = serializer.validated_data.get("pin")
+
+
+            user_instance = UserProfile.objects.filter(phone_number=mobile_number).first()
+
+
+            if pin and user_instance and user_instance.pin:
+                if check_password(pin, user_instance.pin):
+                    token, _ = Token.objects.get_or_create(user=user_instance)
+                    return Response({
+                        "status": True,
+                        "message": "Sign-in complete. You're now connected and ready to go.",
+                        "data": {
+                            "user_token": token.key,
+                            "user": UserProfileInfo(user_instance).data,
+                        }
+                    }, status=status.HTTP_200_OK)
+                else:
+                    return Response({
+                        "status": False,
+                        "message": "Invalid PIN.",
+                    }, status=status.HTTP_401_UNAUTHORIZED)
+
+            # ❌ If user has PIN but no PIN sent → force PIN login
+            if user_instance and user_instance.pin and not pin and not otp:
+                return Response({
+                    "status": False,
+                    "message": "PIN already set. Please login using your PIN.",
+                }, status=status.HTTP_403_FORBIDDEN)
 
             if not otp:
                 # Step 1: Send OTP using Twilio
@@ -88,6 +120,33 @@ class SignInViewset(viewsets.ViewSet):
             "message": self.message,
         }, status=status.HTTP_400_BAD_REQUEST)
 
+class SetPinViewSet(viewsets.ViewSet):
+    permission_classes = [IsAuthenticated]
+
+    def create(self, request):
+        serializer = SetPinSerializer(data=request.data)
+        if serializer.is_valid():
+            pin = serializer.validated_data['pin']
+            user = request.user
+
+            if user.pin:
+                return Response({
+                    "status": False,
+                    "message": "PIN already set. You cannot reset it here.",
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            user.pin = make_password(pin)
+            user.save()
+
+            return Response({
+                "status": True,
+                "message": "PIN set successfully."
+            }, status=status.HTTP_200_OK)
+
+        return Response({
+            "status": False,
+            "errors": serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
 class UserViewset(viewsets.ViewSet):
     serializer_class = CustomUserSerializer
     permission_classes = (IsAuthenticated,)

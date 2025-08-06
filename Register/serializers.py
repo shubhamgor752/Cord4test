@@ -23,6 +23,8 @@ USERNAME_VALIDATORS = [
 class UserSignUpSerializer(serializers.Serializer):
     mobile_number = serializers.CharField(required=True)
     otp = serializers.IntegerField(required=False)
+    pin = serializers.CharField(required=False)
+
 
     @staticmethod
     def validate_phone_number(mobile_number):
@@ -114,3 +116,20 @@ class CustomUserSerializer(serializers.Serializer):
 class LocationSerializer(serializers.Serializer):
     latitude = serializers.FloatField(required=True)
     longitude = serializers.FloatField(required=True)
+
+
+
+class SetPinSerializer(serializers.Serializer):
+    pin = serializers.CharField(
+        min_length=4,
+        max_length=6,
+        write_only=True,
+        required=True
+    )
+
+
+
+    def validate_pin(self, value):
+        if not value.isdigit():
+            raise serializers.ValidationError("PIN must be numeric.")
+        return value

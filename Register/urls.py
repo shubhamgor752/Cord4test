@@ -1,9 +1,12 @@
-from .views import SignInViewset, UserViewset, SwitchAccount, UserListViewSet,LogoutViewset
+from .views import SignInViewset, UserViewset, SwitchAccount, UserListViewSet,LogoutViewset, SetPinViewSet
 from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
 
 router.register("signin", SignInViewset, basename="signin")
+
+router.register('set-pin', SetPinViewSet, basename='set-pin')
+
 
 router.register("user", UserViewset, basename="user")  # edit user/business profile
 

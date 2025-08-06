@@ -15,6 +15,8 @@ class CustomUser(AbstractUser):
     email = models.EmailField(null=True, blank=True)
     is_private = models.BooleanField(default=False)
     # profile_image = models.URLField(max_length=1024, default=PROFILE_IMAGE)
+    pin = models.CharField(max_length=6, null=True, blank=True)
+
 
 
 
