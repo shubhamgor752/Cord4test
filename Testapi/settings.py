@@ -23,10 +23,20 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-dygpzu23g@=w$=ne)pc^bc_*+%@$54%nxqj*__&+$4n(2y_lgg'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
+import os
+DEBUG = os.getenv("DJANGO_DEBUG", "True") == "True"
+
+if DEBUG:
+    CELERY_BROKER_URL = 'redis://localhost:6380/0'
+    CELERY_RESULT_BACKEND = 'redis://localhost:6380/0'
+    CELERY_ACCEPT_CONTENT = ['json']
+    CELERY_TASK_SERIALIZER = 'json'
+else:
+    # In production, disable celery or set it differently (e.g., cloud-based)
+    CELERY_TASK_ALWAYS_EAGER = True  # Tasks run immediately without workers
 ALLOWED_HOSTS = []
-
+# "C:\Program Files\Redis"
 
 # Application definition
 
@@ -145,8 +155,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # CELERY_BROKER_URL = "redis://localhost:6379/0"  # Use your message broker URL
 # CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
 
-
-CELERY_BROKER_URL = "redis://localhost:6379/0"
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 
 
 
@@ -154,7 +164,6 @@ CELERY_BROKER_URL = "redis://localhost:6379/0"
 
 
 from dotenv import load_dotenv
-import os
 
 load_dotenv()
 
