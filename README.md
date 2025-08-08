@@ -27,23 +27,5 @@ This platform allows users to create, edit, and share blog posts, interact throu
 
 ---
 
-## 📂 Project Structure
 
-
-│
-├── testapi/ # Main project folder
-│ ├── settings.py # Project settings
-│ ├── urls.py # Root URL configuration
-│ ├── asgi.py / wsgi.py # Entry points for deployment
-│ └── ...
-│
-├── register/ # User registration, login, profile
-├── chat/ # Chat & messaging system
-├── connection/ # Friend/follower connections
-├── group/ # Groups management
-├── post/ # Blog posts, comments, likes
-│
-├── requirements.txt # Dependencies
-├── manage.py # Django CLI
-└── README.md # Documentation
 
