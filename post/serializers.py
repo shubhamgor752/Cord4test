@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Post, Comment, EventPost, Ticket, TicketPurchase
+from .models import Post, Comment, EventPost, Ticket, TicketPurchase , Poll , PollAnswer
 
 
 class createpostSerializer(serializers.Serializer):
@@ -181,3 +181,54 @@ class TickerOrderSerializer(serializers.Serializer):
 
     def get_purchase_date(self, obj):
         return obj.purchase_date
+
+
+
+class PollCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Poll
+        fields = ['question', 'options']
+
+    def validate_option(self, value):
+        if not issubclass(value , list) or len(value) < 2:
+            raise serializers.ValidationError("There must be Two Options")
+        
+        return value
+    
+
+
+class PollanswerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PollAnswer
+        fields = ['poll', 'selected_option']  # user is set automatically
+        extra_kwargs = {
+            'poll': {'required': True},
+            'selected_option': {'required': True}
+        }
+
+    def validate(self, attrs):
+        poll = attrs.get('poll')
+        selected_option = attrs.get('selected_option')
+        user = self.context['request'].user
+
+        # Prevent duplicate voting
+        if PollAnswer.objects.filter(poll=poll, votedby_user=user).exists():
+            raise serializers.ValidationError("You have already voted on this poll.")
+
+        # Check if selected_option is valid
+        if isinstance(poll.options, list):
+            if selected_option not in poll.options:
+                raise serializers.ValidationError({"selected_option": "Invalid option for this poll."})
+        elif isinstance(poll.options, dict):
+            if selected_option not in poll.options.values():
+                raise serializers.ValidationError({"selected_option": "Invalid option for this poll."})
+
+        return attrs
+
+    def create(self, validated_data):
+        # Set the user automatically
+        validated_data['votedby_user'] = self.context['request'].user
+        return super().create(validated_data)
+
+
+       

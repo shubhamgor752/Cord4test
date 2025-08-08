@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Post, Comment, EventPost, Ticket, TicketPurchase , Poll
+from .models import Post, Comment, EventPost, Ticket, TicketPurchase , Poll , PollAnswer
 
 # Register your models here.
 
@@ -104,3 +104,23 @@ class polladmin(admin.ModelAdmin):
 
 
 admin.site.register(Poll, polladmin)
+
+
+
+
+class pollansweradmin(admin.ModelAdmin):
+    fields = ["poll","votedby_user","selected_option"]
+    list_display = ["poll_creator","poll", "poll_option",  "votedby_user", "selected_option"]
+
+    def poll_creator(self, obj):
+        return obj.poll.author  # returns the user object
+    poll_creator.short_description = "Poll Created By"  # column name
+
+
+    def poll_option(self, obj):
+        return obj.poll.options  # returns the user object
+    poll_option.short_description = "Poll option By"  # column name
+
+
+
+admin.site.register(PollAnswer,pollansweradmin)

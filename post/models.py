@@ -65,3 +65,24 @@ class Poll(models.Model):
 
     def __str__(self):
         return self.question
+
+
+class PollAnswer(models.Model):
+    poll = models.ForeignKey(
+        Poll,
+        on_delete=models.CASCADE,
+        related_name='answers'
+    )
+    votedby_user = models.ForeignKey(
+        CustomUser,
+        on_delete=models.CASCADE,
+        related_name='poll_answers'
+    )
+    selected_option = models.CharField(max_length=255)
+    # answered_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('poll', 'votedby_user')  # Prevent duplicate votes
+
+    def __str__(self):
+        return f"{self.user} voted '{self.selected_option}' on '{self.poll.question}'"

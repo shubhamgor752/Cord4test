@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import Post, Comment, EventPost, Ticket ,TicketPurchase
+from .models import Post, Comment, EventPost, Ticket ,TicketPurchase , Poll
 from .serializers import (
     createpostSerializer,
     ListpostSerializer,
@@ -11,6 +11,8 @@ from .serializers import (
     TicketListSerializer,
     TicketPurchaseSerializer,
     TickerOrderSerializer,
+    PollCreateSerializer,
+    PollanswerSerializer
 )
 from rest_framework.response import Response
 from rest_framework import viewsets , status
@@ -27,6 +29,8 @@ import json
 from django.utils.crypto import get_random_string
 from  django.utils import timezone
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.decorators import action
+
 # Create your views here.
 
 
@@ -882,3 +886,62 @@ class TickerOderViewSet(viewsets.ViewSet, CustomPagination):
 
 
 # working on poll system
+
+class PollViewSet(viewsets.ViewSet):
+    serializer_class = PollCreateSerializer
+    permission_classes = (IsAuthenticated,)
+    res_status, data, message = False, {}, "Invalid Request"
+
+    def create(self, request):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            request_data = serializer.validated_data
+            author = request.user
+            question = request_data.get("question")
+            options = request_data.get("options")  # must match model field name
+
+            poll_instance = Poll.objects.create(
+                author=author,
+                question=question,
+                options=options
+            )
+
+            return Response(
+                {
+                    "status": True,
+                    "message": "Poll created successfully",
+                    "data": self.serializer_class(poll_instance).data
+                },
+                status=status.HTTP_201_CREATED
+            )
+
+        return Response(
+            {
+                "status": False,
+                "message": "Invalid data",
+                "errors": serializer.errors
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+
+
+    @action(detail=True, methods=['post'], url_path='vote')
+    def vote(self, request, pk=None):
+        """Vote on a poll"""
+        try:
+            poll = Poll.objects.get(pk=pk)
+        except Poll.DoesNotExist:
+            return Response({"status": False, "message": "Poll not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        # Pass poll into serializer context so validation works
+        serializer = PollanswerSerializer(
+            data={**request.data, "poll": poll.id},
+            context={'request': request}
+        )
+
+        if serializer.is_valid():
+            serializer.save()  # create() in serializer will set votedby_user automatically
+            return Response({"status": True, "message": "Vote recorded successfully"}, status=status.HTTP_201_CREATED)
+
+        return Response({"status": False, "errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)

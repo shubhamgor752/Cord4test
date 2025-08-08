@@ -14,6 +14,7 @@ from .views import (
     TicketPurchaseViewSet,
     TickerOderViewSet,
     RemoveFromEventViewSet,
+    PollViewSet
 )
 
 router = DefaultRouter()
@@ -45,6 +46,9 @@ router.register("ticket/create", TickerViewSet , basename="create_ticket")
 router.register("ticker/purchase", TicketPurchaseViewSet , basename="ticket_purchase")
 
 router.register("ticket-order/history", TickerOderViewSet , basename="ticket-history")
+
+router.register("create/poll", PollViewSet , basename="poll-create")
+
 
 
 urlpatterns += router.urls
