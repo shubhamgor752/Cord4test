@@ -29,6 +29,8 @@ from  django.utils import timezone
 from rest_framework.pagination import PageNumberPagination
 # Create your views here.
 
+
+
 class CreatepostView(viewsets.ViewSet,CustomPagination):
     serializer_class = createpostSerializer
     permission_classes = (IsAuthenticated,)
@@ -876,3 +878,7 @@ class TickerOderViewSet(viewsets.ViewSet, CustomPagination):
             return Response(
                 {"message": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+
+
+# working on poll system
