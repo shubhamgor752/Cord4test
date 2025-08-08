@@ -22,6 +22,8 @@ from django.db.models import Q
 from datetime import datetime, timedelta
 from chat.tasks import send_scheduled_message
 import logging
+from .utils.ollama_helper import get_suggested_message_ollama
+
 
 logger = logging.getLogger(__name__)
 
@@ -209,8 +211,11 @@ class SuggestMessageViewSet(viewsets.ViewSet):
                 
                 if sender_message.receiver == receiver:
                     if sender_message.id == int(message_id):
-                        sender_message.suggested_message = suggested_messages
-                        sender_message.save()
+                        # sender_message.suggested_message = suggested_messages # this is base file
+                        # sender_message.save()
+
+                        suggested_message = get_suggested_message_ollama(sender_message.message) # this is use from ollama model
+                        sender_message.suggested_message = suggested_message
 
                         return Response(
                             {"status": True, "message": "Suggested message sent successfully", "data": serializer.data},
